@@ -17,7 +17,6 @@ AB_OTA_PARTITIONS += \
     system \
     product \
     vendor
-BOARD_USES_RECOVERY_AS_BOOT := true
 
 # Architecture
 TARGET_ARCH := arm64
@@ -116,3 +115,33 @@ TW_INCLUDE_FUSE_EXFAT := true             # 支持exFAT格式
 TARGET_RECOVERY_FSTAB := $(DEVICE_PATH)/recovery.fstab  # 分区表路径
 BOARD_USES_FASTBOOTD := true  #增加fastbootd支持
 # -------------------------------
+
+# ===== 补充 A/B 分区配置 =====
+# 添加缺失的 boot/dtbo/vbmeta 分区
+AB_OTA_PARTITIONS := \
+    boot \
+    dtbo \
+    vbmeta \
+    system \
+    system_ext \
+    product \
+    vendor
+
+# ===== 独立 Recovery 分区声明 =====
+TARGET_NO_RECOVERY := false
+TARGET_RECOVERY_QCOM_RECOVERY_PARTITION := /dev/block/bootdevice/by-name/recovery
+
+# ===== 加密支持 =====
+TW_INCLUDE_CRYPTO := true
+TW_INCLUDE_CRYPTO_FBE := true
+TW_USE_FSCRYPT_POLICY := 1
+TW_EXCLUDE_DEFAULT_USB_INIT := true
+
+# ===== TWRP 优化 =====
+TW_ENABLE_FUSE_BACKED_UP := true
+TW_BACKUP_EXCLUDE_APEX := true
+TWRP_INCLUDE_LOGCAT := true
+TARGET_USES_LOGD := true
+TW_DEFAULT_BRIGHTNESS := 120
+TW_MAX_BRIGHTNESS := 255
+
