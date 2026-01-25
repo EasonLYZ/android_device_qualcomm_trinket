@@ -101,9 +101,7 @@ PLATFORM_SECURITY_PATCH := 2099-12-31
 VENDOR_SECURITY_PATCH := 2099-12-31
 PLATFORM_VERSION := 16.1.0
 
-# -------------------------------
-# TWRP Configuration（修改后）
-# -------------------------------
+# TWRP Configuration
 TW_THEME := portrait_hdpi              # 适配1872×1404的高密度屏幕
 TW_SCREEN_WIDTH := 1404                   # 竖屏宽（1404）
 TW_SCREEN_HEIGHT := 1872                  # 竖屏高（1872）
@@ -114,10 +112,7 @@ TW_INCLUDE_REPACKTOOLS := true            # 包含repack工具
 TW_INCLUDE_FUSE_EXFAT := true             # 支持exFAT格式
 TARGET_RECOVERY_FSTAB := $(DEVICE_PATH)/recovery.fstab  # 分区表路径
 BOARD_USES_FASTBOOTD := true  #增加fastbootd支持
-# -------------------------------
 
-# ===== 补充 A/B 分区配置 =====
-# 添加缺失的 boot/dtbo/vbmeta 分区
 AB_OTA_PARTITIONS := \
     boot \
     dtbo \
@@ -127,7 +122,6 @@ AB_OTA_PARTITIONS := \
     product \
     vendor
 
-# ===== 独立 Recovery 分区声明 =====
 TARGET_NO_RECOVERY := false
 TARGET_RECOVERY_QCOM_RECOVERY_PARTITION := /dev/block/bootdevice/by-name/recovery
 
