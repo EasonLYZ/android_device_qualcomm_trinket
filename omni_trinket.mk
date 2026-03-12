@@ -36,3 +36,12 @@ BOARD_HAS_NO_REAL_SDCARD := true
 
 # 支持Recovery滑动操作（TWRP必备）
 BOARD_RECOVERY_SWIPE := true
+
+# TWRP fastbootd 支持
+TW_INCLUDE_FASTBOOTD := true
+BOARD_HAS_NO_SELECT_BUTTON := true
+TW_HAS_DOWNLOAD_MODE := true
+
+# 指定init.rc文件
+PRODUCT_COPY_FILES += \
+    device/qualcomm/trinket/recovery/root/init.recovery.trinket.rc:root/init.recovery.trinket.rc:force
