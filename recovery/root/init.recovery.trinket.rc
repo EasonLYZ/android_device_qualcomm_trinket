@@ -1,0 +1,59 @@
+# Copyright (C) 2025 The Android Open Source Project
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+on init
+    # 启动recovery服务
+    start recovery
+
+on boot
+    # 设置基本属性
+    setprop ro.hardware.platform $(getprop ro.board.platform)
+    setprop ro.boot.selinux enforcing
+    setprop sys.usb.configfs 1
+    setprop sys.usb.state mtp
+    
+    # 修复触摸屏方向
+    setprop ro.treble.enabled true
+
+# TWRP服务定义
+service recovery /sbin/recovery
+    class main
+    user root
+    group root
+    disabled
+    oneshot
+
+# 定义reboot命令处理服务
+service reboot_to_fastboot /system/bin/sh
+    class main
+    user root
+    group root
+    disabled
+    oneshot
+    seclabel u:r:magisk:s0
+
+service reboot_to_recovery /system/bin/sh
+    class main
+    user root
+    group root
+    disabled
+    oneshot
+    seclabel u:r:magisk:s0
+
+# 基本权限设置
+chmod 0755 /sbin
+chmod 0755 /sbin/recovery
+chmod 0644 /res
+
+# 设置recovery环境变量
+on property:sys.boot_completed=1
+    setprop ctl.start adbd
+    setprop ctl.start console
+    setprop ro.recovery.config true
+
+# 修复USB设备节点
+on early-init
+    mkdir /dev/kmsg 0660 root system
+    symlink /dev/kmsg /proc/kmsg
