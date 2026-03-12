@@ -42,18 +42,24 @@ service reboot_to_recovery /system/bin/sh
     oneshot
     seclabel u:r:magisk:s0
 
-# 基本权限设置
-chmod 0755 /sbin
-chmod 0755 /sbin/recovery
-chmod 0644 /res
-
 # 设置recovery环境变量
 on property:sys.boot_completed=1
-    setprop ctl.start adbd
-    setprop ctl.start console
     setprop ro.recovery.config true
 
 # 修复USB设备节点
 on early-init
     mkdir /dev/kmsg 0660 root system
     symlink /dev/kmsg /proc/kmsg
+
+# 服务定义用于启动adbd和console
+service adbd /system/bin/adbd
+    class late_start
+    user shell
+    group shell adb
+    socket adbd stream 0660 shell shell
+    disabled
+    oneshot
+
+# 启动adbd服务
+on property:sys.boot_completed=1
+    start adbd
