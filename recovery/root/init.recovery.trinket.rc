@@ -13,7 +13,7 @@ on init
 
 on boot
     # 设置基础属性
-    setprop ro.hardware.platform $(getprop ro.board.platform)
+    setprop ro.hardware.platform trinket
     setprop ro.boot.selinux enforcing
     setprop sys.usb.configfs 1
     setprop sys.usb.state mtp
