@@ -1,22 +1,23 @@
+# init.recovery.trinket.rc - Final Optimized Version
 # Copyright (C) 2025 The Android Open Source Project
-#
 # SPDX-License-Identifier: Apache-2.0
-#
+
+on early-init
+    # 修复 kmsg 符号链接，确保日志可写
+    mkdir /dev/kmsg 0660 root system
+    symlink /dev/kmsg /proc/kmsg
 
 on init
-    # 启动recovery服务
+    # 启动 recovery 主服务
     start recovery
 
 on boot
-    # 设置基本属性
+    # 设置基础属性
+    setprop ro.hardware.platform $(getprop ro.board.platform)
     setprop ro.boot.selinux enforcing
     setprop sys.usb.configfs 1
     setprop sys.usb.state mtp
-    
-    # 修复触摸屏方向
-    setprop ro.treble.enabled true
 
-# TWRP服务定义
 service recovery /sbin/recovery
     class main
     user root
@@ -24,14 +25,14 @@ service recovery /sbin/recovery
     disabled
     oneshot
 
-# 定义reboot命令处理服务
+# 重启服务 - 保留 Magisk 上下文 (根据你的环境决定)
 service reboot_to_fastboot /system/bin/sh
     class main
     user root
     group root
     disabled
     oneshot
-    seclabel u:r:magisk:s0
+    seclabel u:r:magisk:s0 
 
 service reboot_to_recovery /system/bin/sh
     class main
@@ -41,24 +42,30 @@ service reboot_to_recovery /system/bin/sh
     oneshot
     seclabel u:r:magisk:s0
 
-# 设置recovery环境变量
-on property:sys.boot_completed=1
-    setprop ro.recovery.config true
-
-# 修复USB设备节点
-on early-init
-    mkdir /dev/kmsg 0660 root system
-    symlink /dev/kmsg /proc/kmsg
-
-# 服务定义用于启动adbd和console
-service adbd /system/bin/adbd
-    class late_start
+# ADB 服务定义 - 改为通用 adbd 域
+service adbd /sbin/adbd
+    class main
     user shell
-    group shell adb
-    socket adbd stream 0660 shell shell
+    group shell
+    socket adbd stream 660 shell shell
+    disabled
+    oneshot
+    # 使用标准 adbd SELinux 域
+    seclabel u:r:adbd:s0
+
+# 控制台服务定义 - 新增
+service console /sbin/console
+    class main
+    user root
+    group root
+    socket console stream 660 root shell
     disabled
     oneshot
 
-# 启动adbd服务
+# 启动指令
 on property:sys.boot_completed=1
+    # 修正原文件错误，直接启动服务
     start adbd
+    start console
+    # 设置 Recovery 配置完成标志
+    setprop ro.recovery.config true
